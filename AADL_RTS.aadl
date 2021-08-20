@@ -1,0 +1,212 @@
+package AADL_RTS
+public
+  with Base_Types;
+
+  ----------------------------------------------------------
+  -- (AADLv2.3 5.1.1) Runtime Support for Shared Data Access
+
+  data Resource
+    --  Implementation-specific representation
+    --  of list of resources
+  end Resource;
+
+  --- (AADLv2.3 5.1.1) The Get_Resource and Release_Resource
+  --- runtime services represent an abstract interface for
+  --- functions that perform locking and unlocking of resources
+  --- according to the specified concurrency control protocol.
+  --- The method may lock multiple resources simultaneously.
+
+  subprogram Get_Resource
+  features
+    resource: in parameter Resource;
+  end Get_Resource;
+
+  subprogram Release_Resource
+  features
+    resource: in parameter Resource;
+  end Release_Resource;
+
+  -----------------------------------------------
+  -- (AADLv2.3 5.4.8) Runtime Support For Threads
+
+  data Thread_State
+    --  Implementation-specific definition of a thread state.
+  end Thread_State;
+
+  data Error_Code_t
+    --  Implementation-specific definition of an error code.
+  end Error_Code_t;
+
+  --- (AADLv2.3 5.4.8) The Await_Dispatch runtime service is
+  --- called to suspend the thread execution at completion of
+  --- its dispatch execution.  It is the point at which the next
+  --- dispatch resumes. The service call takes several
+  --- parameters.
+  --
+  --  * A thread state State that is
+  --  implementation-defined. This state variable configures the
+  --  dispatch triggers. A method of implementation might
+  --  propose a default value derived from the information from
+  --  the original AADL model, A method of implementation might
+  --  check the validity of this state variable.
+  --
+  -- * It returns Error_Code that indicates whether the call
+  -- succeeded or not
+  --
+  subprogram Await_Dispatch
+  features
+    State: in out parameter Thread_State;
+    Error_Code: out parameter Error_Code_t;
+  end Await_Dispatch;
+
+  data Dispatch_Status_t
+
+  end Dispatch_Status_t;
+
+  --- (AADLv2.3 5.4.8) The Dispatch_Status runtime service
+  --- returns information on the condition that caused a thread
+  --- dispatch.
+  --
+  --  * A thread state State that is implementation-defined. See
+  --  Await_Dispatch for details.
+  --
+  --  * Status returns information on the condition that caused
+  -- a thread dispatch, e.g. the feature that triggered the (see
+  -- Section 8.3.3) or timed event.
+  subprogram Dispatch_Status
+  features
+    State: in parameter Thread_State;
+    Status: out parameter Dispatch_Status_t;
+  end Dispatch_Status;
+
+  --- (AADLv2.3 5.4.8) A Raise_Error runtime service shall be
+  --  provided that allows a thread to explicitly raise a thread
+  --  recoverable or thread unrecoverable error.  Raise_Error
+  --  takes an error type identifier as parameter.
+  subprogram Raise_Error
+  features
+    Error_Code: out parameter Error_Code_t;
+  end Raise_Error;
+
+  --- (AADLv2.3 5.4.8) A Get_Error_Code runtime service shall be
+  --  provided that allows a recover entrypoint to determine the
+  --  type of error that caused the entrypoint to be invoked.
+  subprogram Get_Error_Code
+  features
+    Error_Code: out parameter Error_Code_t;
+  end Get_Error_Code;
+
+  data Call_ID_t
+
+  end Call_ID_t;
+
+  --- (AADLv2.3 5.4.8) A Await_Result runtime service shall be
+  --  provided that allows an application to wait for the result
+  --  of a semi-synchronous subprogram call.
+  subprogram Await_Result
+  features
+    CallID: in parameter Call_ID_t;
+  end Await_Result;
+
+  ---------------------------------------------
+  -- (AADLv2.3 8.3.5) Runtime Support For Ports
+
+  data Port_List_t
+
+  end Port_List_t;
+
+  --- (AADLv2.3 8.3.5) The Send_Output runtime service allows
+  --  the source text of a thread to explicitly cause events,
+  --  event data, or data to be transmitted through outgoing
+  --  ports to receiver ports.  The Send_Output service takes a
+  --  list parameter that specifies for which ports the
+  --  transmission is initiated and the time of
+  --  transmission. Send on multiple ports is considered to
+  --  occur logically simultaneously.
+  subprogram Send_Output
+  features
+    Output_Ports: in parameter Port_List_t;
+    Error_Code: out parameter Error_Code_t;
+  end Send_Output;
+
+  data Port_Variable_t
+
+  end Port_Variable_t;
+
+  data Value_Holder_t
+
+  end Value_Holder_t;
+  --- (AADLv2.3 8.3.5) The Put_Value runtime service allows the
+  --  source text of a thread to supply a data value to a port
+  --  variable.  This data value will be transmitted at the next
+  --  Send_Output call in the source text or by the runtime
+  --  system at completion time or deadline.
+  subprogram Put_Value
+  features
+    Port_Variable: in parameter Port_Variable_t;
+    Data_Value: in parameter Value_Holder_t;
+    Error_Code: out parameter Error_Code_t;
+  end Put_Value;
+
+  --- (AADLv2.3 8.3.5) The Receive_Input runtime service allows
+  --  the source text of a thread to explicitly request port
+  --  input on its incoming ports to be frozen and made
+  --  accessible through the port variables at a said input
+  --  time.  Any previous content of the port variable is
+  --  overwritten.  The Receive_Input service takes as
+  --  parameters the list of oprts to freeze and the reference
+  --  input time.
+  subprogram Receive_Input
+  features
+    Input_Ports: in parameter Port_List_t;
+    Error_Code: out parameter Error_Code_t;
+  end Receive_Input;
+
+  --- (AADLv2.3 8.3.5) A Get_Count runtime service shall be
+  --  provided that allows the source text of a thread to
+  --  determine whether a new data value is available on a port
+  --  variable, and in case of queued event and event data
+  --  ports, how many elements are available to the thread in
+  --  the queue. A count of zero indicates that no data value is
+  --  available.
+  subprogram Get_Count
+  features
+    Port_Variable: in parameter Port_Variable_t;
+    Count_Value: out parameter Base_Types::Integer;
+    Error_Code: out parameter Error_Code_t;
+  end Get_Count;
+
+  --- ((AADLv2.3 8.3.5) A Get_Value runtime service shall be
+  --  provided that allows the source text of a thread to access
+  --  the current value of a port variable.  The service call
+  --  returns the data value.  Repeated calls to Get_Value
+  --  result in the same value to be returned
+  subprogram Get_Value
+  features
+    Port_Variable: in parameter Port_Variable_t;
+    Data_Value: out parameter Value_Holder_t;
+    Error_Code: out parameter Error_Code_t;
+  end Get_Value;
+
+  --- (AADLv2.3 8.3.5) A Next_Value runtime service shall be
+  --  provided that allows the source text of a thread to get
+  --  access to the next queued element of a port variable as
+  --  the current value.
+  subprogram Next_Value
+  features
+    Port_Variable: in parameter Port_Variable_t;
+    Error_Code: out parameter Error_Code_t;
+  end Next_Value;
+
+  --- (AADLv2.3 8.3.5) A Updated runtime service shall be
+  --  provided that allows the source text of a thread to
+  --  determine whether input has been transmitted to a port
+  --  since the last Receive_Input service call.
+  subprogram Updated
+  features
+    Port_Variable: in parameter Port_Variable_t;
+    FreshFlag: out parameter Base_Types::Boolean;
+    Error_Code: out parameter Error_Code_t;
+  end Updated;
+
+end AADL_RTS;
