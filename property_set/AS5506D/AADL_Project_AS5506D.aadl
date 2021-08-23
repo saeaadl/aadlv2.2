@@ -1,6 +1,7 @@
 --AADL2
 --SAE Aerospace Standard AS5506D
 --Appendix A: Predeclared Property Sets
+
 property set AADL_Project_AS5506D is
 
 --- The <b>Supported_Active_Thread_Handling_Protocols</b> property enumeration type specifies the set of possible
@@ -181,13 +182,7 @@ property set AADL_Project_AS5506D is
 		kbps => bitsps * 1000, Mbps => Kbps * 1000, Gbps => Mbps * 1000,
 		Bytesps => bitsps * 8, KBytesps => Bytesps * 1000, MBytesps => KBytesps * 1000, GBytesps => MBytesps * 1000);
 
-	Data_Volume_Units: type units (bitsps, Bytesps => bitsps * 8, KBytesps => Bytesps * 1000,
-		MBytesps => KBytesps * 1000, GBytesps => MBytesps * 1000);
-	Max_Volume: constant Data_Volume => 1000 GBytesps;
-
-	Data_Volume: type aadlinteger 0 bitsps .. Max_Volume units Data_Volume_Units;
-
-	--- Speed in terms of instructions executed per second
+	--- The type <b>Processor_Speed_Units</b> defines a measurement of the speed at which a processor operates. 
 	Processor_Speed_Units: type units (KIPS, MIPS => KIPS * 1000, GIPS => MIPS * 1000);
 
 end AADL_Project_AS5506D;
