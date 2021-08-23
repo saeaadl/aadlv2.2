@@ -1,0 +1,38 @@
+package issue_16
+public
+	system Parent
+		features
+			FG1: feature group FG1;
+	end Parent;
+
+	system implementation Parent.impl
+		subcomponents
+			Child: system Child.impl;
+			Child2: system Child.impl;
+		connections
+			Connection1: feature Child.F1 -> FG1.FG2;
+			Connection2: feature Child.FG1.F2 -> Child2.FG1.F3; -- 9.1 (L7)
+			--  Connection3: feature Child.F1 -> FG1.FG2.F3; -- invalid per 9.1 (L7)
+	end Parent.impl;
+
+	system Child
+		features
+			F1: out feature;
+			FG1: feature group FG1;
+	end Child;
+
+	system implementation Child.impl
+	end Child.impl;
+
+	feature group FG1
+		features
+			F2: out feature;
+			F3: in feature;
+			FG2: feature group FG2;
+	end FG1;
+
+	feature group FG2
+		features
+			F3: out feature;
+	end FG2;
+end issue_16;
