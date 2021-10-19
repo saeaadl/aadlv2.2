@@ -1,3 +1,7 @@
+--AADL2
+--SAE Aerospace Standard AS5506D
+--Appendix A: Runtime Services
+
 package AADL_RTS
 public
   with Base_Types;
